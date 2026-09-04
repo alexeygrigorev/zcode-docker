@@ -18,8 +18,8 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export XDG_RUNTIME_DIR="$RUNTIME_DIR"
 
-# Use a Chromium-family browser by default; WebKit/bwrap cannot operate in
-# this container profile, while Chrome's auth flow can.
+# ZCode opens OAuth URLs through xdg-open. Chrome handles those reliably in
+# this container, while Epiphany's WebKit/bwrap sandbox does not.
 if command -v xdg-settings >/dev/null 2>&1 && command -v google-chrome >/dev/null 2>&1; then
   xdg-settings set default-web-browser google-chrome.desktop >/dev/null 2>&1 || true
   xdg-mime default google-chrome.desktop x-scheme-handler/https >/dev/null 2>&1 || true

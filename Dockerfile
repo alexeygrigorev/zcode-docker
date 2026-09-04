@@ -67,6 +67,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
+    && apt-get install -y --no-install-recommends xdotool \
+    && rm -rf /var/lib/apt/lists/* \
+    && wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/google-chrome.deb \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends /tmp/google-chrome.deb \
+    && rm -rf /var/lib/apt/lists/* /tmp/google-chrome.deb
+
+RUN apt-get update \
     && apt-get install -y --no-install-recommends novnc \
     && rm -rf /var/lib/apt/lists/*
 

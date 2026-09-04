@@ -1,6 +1,6 @@
 [begin] (Zcode)
   [exec] (Terminal) {xterm}
-  [exec] (Browser) {google-chrome}
+  [exec] (Browser) {google-chrome --no-first-run --no-default-browser-check}
   [exec] (Zcode) {/opt/ZCode/zcode --no-sandbox --password-store=basic}
   [exit] (Exit)
 [end]
