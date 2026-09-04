@@ -1,0 +1,6 @@
+[begin] (Zcode)
+  [exec] (Terminal) {xterm}
+  [exec] (Browser) {google-chrome}
+  [exec] (Zcode) {/opt/ZCode/zcode --no-sandbox --password-store=basic}
+  [exit] (Exit)
+[end]

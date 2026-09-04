@@ -1,0 +1,32 @@
+services:
+  zcode:
+    build:
+      context: .
+    image: zcode-browser:latest
+    container_name: zcode-browser
+    # The entrypoint adjusts ownership/config paths for arbitrary host UID/GID.
+    user: "${ZCODE_UID:-1000}:${ZCODE_GID:-1000}"
+    environment:
+      ZCODE_UID: "${ZCODE_UID:-1000}"
+      ZCODE_GID: "${ZCODE_GID:-1000}"
+      ZCODE_HOST_USER: "${ZCODE_HOST_USER:-alexey}"
+      HOME: /home/zcode
+      DISPLAY: :99
+      VNC_PORT: "${ZCODE_NOVNC_PORT:-6180}"
+      VNC_BACKEND_PORT: "6181"
+      NO_AT_BRIDGE: "1"
+      ELECTRON_DISABLE_SECURITY_WARNINGS: "1"
+    init: true
+    network_mode: host
+    shm_size: 1g
+    security_opt:
+      - seccomp=unconfined
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=1g,mode=1777
+      - /run:rw,nosuid,nodev,size=64m,mode=0755
+      - /run/user/1000:rw,nosuid,nodev,size=64m,uid=1000,gid=1000,mode=0700
+    volumes:
+      # Deliberate: the browser session has direct read/write access to the
+      # entire host home, including credentials there.
+      - ${ZCODE_HOME:?Set ZCODE_HOME to your absolute home directory}:/home/zcode:rw
+    restart: unless-stopped
