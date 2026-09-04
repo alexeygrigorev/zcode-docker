@@ -8,6 +8,10 @@ ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     DEBIAN_FRONTEND=noninteractive
 
+# Pinned by the build/compose args. Changing it busts only the ZCode download
+# layer below, not the slower apt dependency layers.
+ARG ZCODE_VERSION=unpinned
+
 # Zcode's manifest gives a SHA-512 digest for the current release. Download it
 # during the build and verify it before the package is unpacked.
 COPY scripts/download-zcode-release.sh /usr/local/bin/download-zcode-release
@@ -48,7 +52,11 @@ RUN apt-get update \
         epiphany-browser \
         xterm \
         xvfb \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
+
+# Referencing ZCODE_VERSION here makes Docker rebuild this layer only when the
+# resolved release changes, while keeping the apt layers above cached.
+RUN echo "ZCode release: $ZCODE_VERSION" \
     && download-zcode-release --asset deb --out /tmp/zcode-install \
     && apt-get update \
     && apt-get install -y --no-install-recommends /tmp/zcode-install/ZCode-*.deb \
@@ -84,6 +92,8 @@ COPY --chmod=0755 container-entrypoint.sh /usr/local/bin/zcode-container-entrypo
 RUN chmod 0755 /usr/local/share/zcode-docker
 
 RUN install -d -o 1000 -g 1000 -m 0755 /home/zcode
+
+LABEL zcode.version="${ZCODE_VERSION}"
 
 # Build-time user. Compose overrides it with the host UID/GID at runtime.
 USER 1000:1000

@@ -1,3 +1,4 @@
 .env
+.zcode-version
 dist/
 build/

@@ -2,6 +2,8 @@ services:
   zcode:
     build:
       context: .
+      args:
+        ZCODE_VERSION: "${ZCODE_VERSION:-}"
     image: zcode-browser:latest
     container_name: zcode-browser
     # The entrypoint adjusts ownership/config paths for arbitrary host UID/GID.

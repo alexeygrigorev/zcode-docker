@@ -47,6 +47,19 @@ if [[ ! -e "$HOME/.fluxbox/menu" ]]; then
   install -m 0644 /usr/local/share/zcode-docker/fluxbox-menu "$HOME/.fluxbox/menu"
 fi
 
+# A killed container can leave ZCode's mkdir-based settings lock behind on the
+# shared home mount. Every later settings write (recent projects, last open
+# workspaces) then times out after ~8s, so newly opened projects are never
+# persisted and the next restart restores only old projects. The lock is held
+# only for the duration of an atomic file write (milliseconds), so a lock dir
+# older than a few minutes is guaranteed stale and safe to drop.
+ZCODE_SETTINGS_LOCK="$HOME/.zcode/v2/setting.json.lock"
+if [[ -d "$ZCODE_SETTINGS_LOCK" ]] && [[ -z "$(find "$ZCODE_SETTINGS_LOCK" -maxdepth 0 -mmin -5 2>/dev/null)" ]]; then
+  printf 'Removing stale ZCode settings lock: %s\n' "$ZCODE_SETTINGS_LOCK" >&2
+  rm -rf "$ZCODE_SETTINGS_LOCK"
+fi
+unset ZCODE_SETTINGS_LOCK
+
 export DBUS_SESSION_BUS_ADDRESS="unix:path=$RUNTIME_DIR/bus"
 dbus-daemon --session --fork --address="$DBUS_SESSION_BUS_ADDRESS" --nopidfile
 

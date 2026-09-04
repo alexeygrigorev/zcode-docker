@@ -56,6 +56,40 @@ written by the GUI appears directly in host paths.
 ./scripts/dev.sh down
 ```
 
+## Sessions and restarts
+
+Zcode sessions and transcripts live in `~/.zcode` on your mounted home
+directory, so they survive container restarts. The session list is shown
+per open workspace folder: after a restart, reopen each project folder
+(`File > Open Folder`, e.g. `/home/zcode/git/...`) to see its sessions
+again.
+
+Prefer `./scripts/dev.sh down` (or `stop`) over killing the container.
+A killed container leaves running sessions unresumable: their transcripts
+stay on disk, but reopening them in the UI fails while the app tries to
+reach the dead owner process (about an 85s timeout, then an empty view).
+The entrypoint clears a stale `setting.json` lock left by a killed
+container so newly opened projects keep being persisted for the next
+restart.
+
+## Update
+
+```bash
+./scripts/dev.sh update
+```
+
+This fetches the current stable release version from the official Zcode
+manifest and rebuilds the image only. The running container is NOT restarted,
+so an in-progress desktop session is safe; apply the new image with
+`./scripts/dev.sh restart` when it is convenient (that does end the current
+desktop session, so save any unsaved work in the app first).
+
+Because the release version keys the Docker build cache, the apt dependency
+layers are reused and only the ZCode download/install layer reruns when the
+version actually changed. The resolved version is cached in
+`.zcode-version` so plain `./scripts/dev.sh` runs do not touch the network for
+version resolution and stay cache-consistent with the last update.
+
 The root filesystem is writable because Electron/Chromium update and cache
 behavior varies by release. `/tmp`, `/run`, and the user runtime directory are
 container-private tmpfs mounts. Home state is not container-private.
