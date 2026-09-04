@@ -16,10 +16,8 @@ the `.deb` is installed.
 This is intentionally not a sandboxed onboarding container. It receives your
 entire host home directory, so it can read and write all files there, including
 SSH keys, browser cookies, API credentials, Git credentials, and Zcode state.
-It runs as your UID/GID. Docker's default seccomp profile is disabled only to
-let WebKit create the unprivileged user namespace required by its nested
-browser sandbox; Linux capabilities remain dropped and the container is not
-privileged.
+It runs as your UID/GID with Docker's default seccomp profile disabled so the
+authentication browser can operate normally; the container is not privileged.
 
 The noVNC endpoint has no password. The listener is restricted to host loopback
 by default. Do not change
@@ -46,12 +44,9 @@ ZCODE_NOVNC_PORT=6280 ./scripts/dev.sh
 ```
 
 The default Zcode working directory inside the desktop is your home directory.
-Open a terminal from the Fluxbox menu for shell work. Because `/home/zcode` is
-your real home, configuration written by the GUI appears directly in host paths.
-Google Chrome is the default authentication browser. ZCode's previous default,
-Epiphany, failed because WebKit's bubblewrap sandbox cannot create its mount
-namespace inside this container. Chrome cookies and profile data are written
-under your normal home directory.
+Open a terminal or Google Chrome from the Fluxbox menu for shell or
+authentication work. Because `/home/zcode` is your real home, configuration
+written by the GUI appears directly in host paths.
 
 ## Operations
 
